@@ -1,11 +1,15 @@
+# Complete Updated `app.py`
 from flask import Flask, render_template, request
 import sqlite3
+import os
 
 app = Flask(__name__)
+
 
 # =========================
 # DATABASE INITIALIZATION
 # =========================
+
 
 def init_db():
 
@@ -34,7 +38,7 @@ def home():
 
 
 # =========================
-# GAIN SCENARIO PAGE
+# GAIN PAGE
 # =========================
 
 @app.route('/gain')
@@ -43,7 +47,7 @@ def gain():
 
 
 # =========================
-# LOSS SCENARIO PAGE
+# LOSS PAGE
 # =========================
 
 @app.route('/loss', methods=['POST'])
@@ -79,7 +83,7 @@ def submit():
     conn.commit()
 
     # =========================
-    # LIVE DASHBOARD COUNTS
+    # LIVE COUNTS
     # =========================
 
     gain_a = cursor.execute(
@@ -105,7 +109,7 @@ def submit():
     conn.close()
 
     # =========================
-    # BEHAVIORAL PROFILE
+    # PROFILE LOGIC
     # =========================
 
     if gain_choice == 'A' and loss_choice == 'B':
@@ -113,10 +117,8 @@ def submit():
         profile_title = "Classic Loss Aversion"
 
         profile_description = (
-            "You preferred certainty while gaining money "
-            "but became risk-seeking when facing losses. "
-            "This is one of the strongest indicators of "
-            "loss aversion in behavioral economics."
+            "You preferred certainty during gains but became risk-seeking while facing losses. "
+            "This is one of the strongest indicators of loss aversion in behavioral economics."
         )
 
     elif gain_choice == 'A' and loss_choice == 'A':
@@ -124,9 +126,8 @@ def submit():
         profile_title = "Highly Risk Averse"
 
         profile_description = (
-            "You preferred certainty in both gain and loss situations. "
-            "This suggests a conservative decision-making style "
-            "with strong preference for predictable outcomes."
+            "You preferred certainty in both scenarios. "
+            "This suggests a conservative investment personality."
         )
 
     elif gain_choice == 'B' and loss_choice == 'B':
@@ -134,7 +135,7 @@ def submit():
         profile_title = "High Risk Seeker"
 
         profile_description = (
-            "You consistently preferred risky outcomes in both scenarios. "
+            "You consistently preferred risky outcomes in both situations. "
             "This indicates a higher tolerance for uncertainty and volatility."
         )
 
@@ -143,13 +144,12 @@ def submit():
         profile_title = "Balanced Risk Behavior"
 
         profile_description = (
-            "Your decisions suggest mixed behavioral tendencies. "
-            "You may evaluate gains and losses differently "
-            "depending on context and perceived opportunity."
+            "Your choices indicate mixed behavioral tendencies. "
+            "You may evaluate opportunities differently depending on context."
         )
 
     # =========================
-    # SHOW RESULT PAGE
+    # RESULT PAGE
     # =========================
 
     return render_template(
@@ -172,10 +172,10 @@ def submit():
 
 
 # =========================
-# DASHBOARD PAGE
+# SECRET FACILITATOR DASHBOARD
 # =========================
 
-@app.route('/dashboard')
+@app.route('/cicm-facilitator-dashboard')
 def dashboard():
 
     conn = sqlite3.connect('responses.db')
@@ -206,10 +206,7 @@ def dashboard():
 
     conn.close()
 
-    # =========================
     # PERCENTAGES
-    # =========================
-
     gain_total = gain_a + gain_b
     loss_total = loss_a + loss_b
 
@@ -248,8 +245,9 @@ if __name__ == '__main__':
 
     init_db()
 
+    port = int(os.environ.get('PORT', 5000))
+
     app.run(
         host='0.0.0.0',
-        port=5000,
-        debug=True
+        port=port
     )
