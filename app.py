@@ -1,15 +1,12 @@
-# Complete Updated `app.py`
-from flask import Flask, render_template, request
+import flask
 import sqlite3
 import os
 
-app = Flask(__name__)
-
+app = flask.Flask(__name__)
 
 # =========================
 # DATABASE INITIALIZATION
 # =========================
-
 
 def init_db():
 
@@ -34,7 +31,7 @@ def init_db():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return flask.render_template('index.html')
 
 
 # =========================
@@ -43,7 +40,7 @@ def home():
 
 @app.route('/gain')
 def gain():
-    return render_template('gain.html')
+    return flask.render_template('gain.html')
 
 
 # =========================
@@ -53,9 +50,9 @@ def gain():
 @app.route('/loss', methods=['POST'])
 def loss():
 
-    gain_choice = request.form['gain_choice']
+    gain_choice = flask.request.form['gain_choice']
 
-    return render_template(
+    return flask.render_template(
         'loss.html',
         gain_choice=gain_choice
     )
@@ -68,8 +65,8 @@ def loss():
 @app.route('/submit', methods=['POST'])
 def submit():
 
-    gain_choice = request.form['gain_choice']
-    loss_choice = request.form['loss_choice']
+    gain_choice = flask.request.form['gain_choice']
+    loss_choice = flask.request.form['loss_choice']
 
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
@@ -117,8 +114,9 @@ def submit():
         profile_title = "Classic Loss Aversion"
 
         profile_description = (
-            "You preferred certainty during gains but became risk-seeking while facing losses. "
-            "This is one of the strongest indicators of loss aversion in behavioral economics."
+            "You preferred certainty during gains but became risk-seeking "
+            "while facing losses. This is one of the strongest indicators "
+            "of loss aversion in behavioral economics."
         )
 
     elif gain_choice == 'A' and loss_choice == 'A':
@@ -148,11 +146,7 @@ def submit():
             "You may evaluate opportunities differently depending on context."
         )
 
-    # =========================
-    # RESULT PAGE
-    # =========================
-
-    return render_template(
+    return flask.render_template(
         'result.html',
 
         gain_choice=gain_choice,
@@ -181,7 +175,6 @@ def dashboard():
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
 
-    # GAIN COUNTS
     gain_a = cursor.execute(
         "SELECT COUNT(*) FROM responses WHERE gain_choice='A'"
     ).fetchone()[0]
@@ -190,7 +183,6 @@ def dashboard():
         "SELECT COUNT(*) FROM responses WHERE gain_choice='B'"
     ).fetchone()[0]
 
-    # LOSS COUNTS
     loss_a = cursor.execute(
         "SELECT COUNT(*) FROM responses WHERE loss_choice='A'"
     ).fetchone()[0]
@@ -199,26 +191,22 @@ def dashboard():
         "SELECT COUNT(*) FROM responses WHERE loss_choice='B'"
     ).fetchone()[0]
 
-    # TOTAL PARTICIPANTS
     total = cursor.execute(
         "SELECT COUNT(*) FROM responses"
     ).fetchone()[0]
 
     conn.close()
 
-    # PERCENTAGES
     gain_total = gain_a + gain_b
     loss_total = loss_a + loss_b
 
     gain_a_pct = round((gain_a / gain_total) * 100, 1) if gain_total else 0
-
     gain_b_pct = round((gain_b / gain_total) * 100, 1) if gain_total else 0
 
     loss_a_pct = round((loss_a / loss_total) * 100, 1) if loss_total else 0
-
     loss_b_pct = round((loss_b / loss_total) * 100, 1) if loss_total else 0
 
-    return render_template(
+    return flask.render_template(
         'dashboard.html',
 
         gain_a=gain_a,
@@ -251,8 +239,3 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=port
     )
-
-
-@app.route('/cicm-facilitator-dashboard')
-def cicm_facilitator_dashboard():
-    return render_template('cicm_facilitator_dashboard.html')
