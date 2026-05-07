@@ -251,3 +251,8 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=port
     )
+
+
+@app.route('/cicm-facilitator-dashboard')
+def cicm_facilitator_dashboard():
+    return render_template('cicm_facilitator_dashboard.html')
