@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Riskometric Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .card-custom {
+            background-color: #1e293b;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        }
+
+        h1, h2, h3 {
+            font-weight: bold;
+        }
+
+        .count {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+
+        .insight-text {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <h1 class="text-center mb-5">
+        Riskometric Facilitator Dashboard
+    </h1>
+
+    <div class="row">
+
+        <!-- Gain Scenario -->
+        <div class="col-md-6">
+
+            <div class="card-custom">
+
+                <h2>Gain Scenario</h2>
+
+                <p class="count">
+                    Option A: {{ gain_a }} ({{ gain_a_pct }}%)
+                </p>
+
+                <p class="count">
+                    Option B: {{ gain_b }} ({{ gain_b_pct }}%)
+                </p>
+
+                <canvas id="gainChart"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- Loss Scenario -->
+        <div class="col-md-6">
+
+            <div class="card-custom">
+
+                <h2>Loss Scenario</h2>
+
+                <p class="count">
+                    Option A: {{ loss_a }} ({{ loss_a_pct }}%)
+                </p>
+
+                <p class="count">
+                    Option B: {{ loss_b }} ({{ loss_b_pct }}%)
+                </p>
+
+                <canvas id="lossChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Total Participants -->
+    <div class="card-custom text-center mt-4">
+
+        <h3>Total Participants</h3>
+
+        <h1>{{ total }}</h1>
+
+    </div>
+
+    <!-- Behavioral Insight -->
+    <div class="card-custom text-center mt-4">
+
+        <h3>Behavioral Insight</h3>
+
+        <p class="insight-text">
+
+            Participants showed risk-averse behavior in gain scenarios
+            and risk-seeking behavior in loss scenarios.
+
+            This demonstrates the behavioral economics principle of
+            <strong>Loss Aversion</strong>.
+
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+
+    // AUTO REFRESH EVERY 5 SECONDS
+    setInterval(() => {
+        location.reload();
+    }, 5000);
+
+    // GAIN CHART
+    new Chart(document.getElementById('gainChart'), {
+
+        type: 'pie',
+
+        data: {
+
+            labels: ['Option A', 'Option B'],
+
+            datasets: [{
+
+                data: ["{{ gain_a }}", "{{ gain_b }}"]
+
+            }]
+        }
+    });
+
+    // LOSS CHART
+    new Chart(document.getElementById('lossChart'), {
+
+        type: 'pie',
+
+        data: {
+
+            labels: ['Option A', 'Option B'],
+
+            datasets: [{
+
+                data: ["{{ loss_a }}", "{{ loss_b }}"]
+
+            }]
+        }
+    });
+
+</script>
+
+</body>
+
+</html>
