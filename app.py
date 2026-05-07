@@ -1,8 +1,8 @@
-import flask
+from flask import Flask, render_template, request
 import sqlite3
 import os
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 # =========================
 # DATABASE INITIALIZATION
@@ -16,8 +16,14 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS responses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+
             gain_choice TEXT,
-            loss_choice TEXT
+            loss_choice TEXT,
+
+            certainty_choice TEXT,
+            sunkcost_choice TEXT,
+            herd_choice TEXT,
+            overconfidence_choice TEXT
         )
     ''')
 
@@ -31,7 +37,7 @@ def init_db():
 
 @app.route('/')
 def home():
-    return flask.render_template('index.html')
+    return render_template('index.html')
 
 
 # =========================
@@ -40,7 +46,7 @@ def home():
 
 @app.route('/gain')
 def gain():
-    return flask.render_template('gain.html')
+    return render_template('gain.html')
 
 
 # =========================
@@ -50,11 +56,94 @@ def gain():
 @app.route('/loss', methods=['POST'])
 def loss():
 
-    gain_choice = flask.request.form['gain_choice']
+    gain_choice = request.form['gain_choice']
 
-    return flask.render_template(
+    return render_template(
         'loss.html',
         gain_choice=gain_choice
+    )
+
+
+# =========================
+# CERTAINTY EFFECT PAGE
+# =========================
+
+@app.route('/certainty', methods=['POST'])
+def certainty():
+
+    gain_choice = request.form['gain_choice']
+    loss_choice = request.form['loss_choice']
+
+    return render_template(
+        'certainty.html',
+        gain_choice=gain_choice,
+        loss_choice=loss_choice
+    )
+
+
+# =========================
+# SUNK COST PAGE
+# =========================
+
+@app.route('/sunkcost', methods=['POST'])
+def sunkcost():
+
+    gain_choice = request.form['gain_choice']
+    loss_choice = request.form['loss_choice']
+    certainty_choice = request.form['certainty_choice']
+
+    return render_template(
+        'sunkcost.html',
+
+        gain_choice=gain_choice,
+        loss_choice=loss_choice,
+        certainty_choice=certainty_choice
+    )
+
+
+# =========================
+# HERD MENTALITY PAGE
+# =========================
+
+@app.route('/herd', methods=['POST'])
+def herd():
+
+    gain_choice = request.form['gain_choice']
+    loss_choice = request.form['loss_choice']
+    certainty_choice = request.form['certainty_choice']
+    sunkcost_choice = request.form['sunkcost_choice']
+
+    return render_template(
+        'herd.html',
+
+        gain_choice=gain_choice,
+        loss_choice=loss_choice,
+        certainty_choice=certainty_choice,
+        sunkcost_choice=sunkcost_choice
+    )
+
+
+# =========================
+# OVERCONFIDENCE PAGE
+# =========================
+
+@app.route('/overconfidence', methods=['POST'])
+def overconfidence():
+
+    gain_choice = request.form['gain_choice']
+    loss_choice = request.form['loss_choice']
+    certainty_choice = request.form['certainty_choice']
+    sunkcost_choice = request.form['sunkcost_choice']
+    herd_choice = request.form['herd_choice']
+
+    return render_template(
+        'overconfidence.html',
+
+        gain_choice=gain_choice,
+        loss_choice=loss_choice,
+        certainty_choice=certainty_choice,
+        sunkcost_choice=sunkcost_choice,
+        herd_choice=herd_choice
     )
 
 
@@ -65,17 +154,47 @@ def loss():
 @app.route('/submit', methods=['POST'])
 def submit():
 
-    gain_choice = flask.request.form['gain_choice']
-    loss_choice = flask.request.form['loss_choice']
+    gain_choice = request.form['gain_choice']
+    loss_choice = request.form['loss_choice']
+
+    certainty_choice = request.form['certainty_choice']
+    sunkcost_choice = request.form['sunkcost_choice']
+    herd_choice = request.form['herd_choice']
+    overconfidence_choice = request.form['overconfidence_choice']
 
     conn = sqlite3.connect('responses.db')
     cursor = conn.cursor()
 
+    # =========================
     # SAVE RESPONSE
+    # =========================
+
     cursor.execute('''
-        INSERT INTO responses (gain_choice, loss_choice)
-        VALUES (?, ?)
-    ''', (gain_choice, loss_choice))
+        INSERT INTO responses (
+
+            gain_choice,
+            loss_choice,
+
+            certainty_choice,
+            sunkcost_choice,
+            herd_choice,
+            overconfidence_choice
+
+        )
+
+        VALUES (?, ?, ?, ?, ?, ?)
+
+    ''', (
+
+        gain_choice,
+        loss_choice,
+
+        certainty_choice,
+        sunkcost_choice,
+        herd_choice,
+        overconfidence_choice
+
+    ))
 
     conn.commit()
 
@@ -109,48 +228,81 @@ def submit():
     # PROFILE LOGIC
     # =========================
 
-    if gain_choice == 'A' and loss_choice == 'B':
+    score = 0
 
-        profile_title = "Classic Loss Aversion"
+    if gain_choice == 'B':
+        score += 1
+
+    if loss_choice == 'B':
+        score += 1
+
+    if certainty_choice == 'B':
+        score += 1
+
+    if sunkcost_choice == 'B':
+        score += 1
+
+    if herd_choice == 'B':
+        score += 1
+
+    if overconfidence_choice == 'B':
+        score += 1
+
+    # =========================
+    # PROFILE GENERATION
+    # =========================
+
+    if score <= 1:
+
+        profile_title = "Conservative Investor"
 
         profile_description = (
-            "You preferred certainty during gains but became risk-seeking "
-            "while facing losses. This is one of the strongest indicators "
-            "of loss aversion in behavioral economics."
+            "You display cautious financial behavior and prefer stability "
+            "over uncertainty. You are less likely to make impulsive "
+            "investment decisions."
         )
 
-    elif gain_choice == 'A' and loss_choice == 'A':
+    elif score <= 3:
 
-        profile_title = "Highly Risk Averse"
+        profile_title = "Balanced Decision Maker"
 
         profile_description = (
-            "You preferred certainty in both scenarios. "
-            "This suggests a conservative investment personality."
+            "You demonstrate moderate risk-taking tendencies while still "
+            "maintaining rational investment discipline."
         )
 
-    elif gain_choice == 'B' and loss_choice == 'B':
+    elif score <= 5:
 
-        profile_title = "High Risk Seeker"
+        profile_title = "Aggressive Risk Taker"
 
         profile_description = (
-            "You consistently preferred risky outcomes in both situations. "
-            "This indicates a higher tolerance for uncertainty and volatility."
+            "You are highly comfortable with uncertainty and volatility. "
+            "You may pursue high-reward opportunities aggressively."
         )
 
     else:
 
-        profile_title = "Balanced Risk Behavior"
+        profile_title = "Behaviorally Driven Trader"
 
         profile_description = (
-            "Your choices indicate mixed behavioral tendencies. "
-            "You may evaluate opportunities differently depending on context."
+            "Your decisions show strong behavioral influences such as "
+            "FOMO, overconfidence, and emotional investing."
         )
 
-    return flask.render_template(
+    # =========================
+    # RESULT PAGE
+    # =========================
+
+    return render_template(
         'result.html',
 
         gain_choice=gain_choice,
         loss_choice=loss_choice,
+
+        certainty_choice=certainty_choice,
+        sunkcost_choice=sunkcost_choice,
+        herd_choice=herd_choice,
+        overconfidence_choice=overconfidence_choice,
 
         profile_title=profile_title,
         profile_description=profile_description,
@@ -206,7 +358,7 @@ def dashboard():
     loss_a_pct = round((loss_a / loss_total) * 100, 1) if loss_total else 0
     loss_b_pct = round((loss_b / loss_total) * 100, 1) if loss_total else 0
 
-    return flask.render_template(
+    return render_template(
         'dashboard.html',
 
         gain_a=gain_a,

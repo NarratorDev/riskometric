@@ -1,0 +1,78 @@
+<!-- sunkcost.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sunk Cost Fallacy</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-dark text-white">
+
+<div class="container mt-5">
+
+    <h1>Question 4 — Sunk Cost Fallacy</h1>
+
+    <form action="/herd" method="POST">
+
+        <input type="hidden" name="gain_choice" value="{{ gain_choice }}">
+        <input type="hidden" name="loss_choice" value="{{ loss_choice }}">
+        <input type="hidden" name="certainty_choice" value="{{ certainty_choice }}">
+
+        <div class="card bg-secondary p-4 mt-4">
+
+            <h3>Your stock investment has fallen 40% in 6 months.</h3>
+
+            <div class="form-check mt-3">
+
+                <input class="form-check-input"
+                       type="radio"
+                       name="sunkcost_choice"
+                       value="A"
+                       required>
+
+                <label class="form-check-label">
+
+                    Sell and reinvest elsewhere
+
+                </label>
+
+            </div>
+
+            <div class="form-check mt-3">
+
+                <input class="form-check-input"
+                       type="radio"
+                       name="sunkcost_choice"
+                       value="B">
+
+                <label class="form-check-label">
+
+                    Hold because you already invested heavily
+
+                </label>
+
+            </div>
+
+            <button class="btn btn-primary mt-4">
+
+                Continue
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
